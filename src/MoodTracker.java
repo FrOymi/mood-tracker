@@ -33,6 +33,7 @@ public class MoodTracker {
             String timeOfDay = setTimeOfDay(LocalTime.now().getHour());
             System.out.println(timeOfDay.equals("night") ? "Hi there!" : "Good ".concat(timeOfDay).concat("!"));
 
+            // Main Menu
             mainLoop:
             while(true) {
                 System.out.print("1. Add mood\n" +
@@ -55,6 +56,7 @@ public class MoodTracker {
                             String moodName = sc.nextLine();
                             Mood newMood = new Mood(moodName);
 
+                            // Add Mood Menu
                             addMenuLoop:
                             while(true) {
                                 System.out.println("\n" + newMood + "\n");
