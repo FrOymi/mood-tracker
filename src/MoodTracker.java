@@ -3,6 +3,7 @@ import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 
 public class MoodTracker {
     private static String setTimeOfDay(int hours) {
@@ -22,7 +23,8 @@ public class MoodTracker {
     }
 
     public static void main(String[] args) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         Scanner sc = new Scanner(System.in);
         ArrayList<Mood> moods = new ArrayList<>();
@@ -46,7 +48,7 @@ public class MoodTracker {
                 try {
                     int usrAction_mainMenu = Integer.parseInt(sc.nextLine());
                     if (usrAction_mainMenu < 0 || usrAction_mainMenu > 5) {
-                        System.out.println("Select an existing menu item!");
+                        System.out.println("Select an existing menu item!\n");
                         continue mainLoop;
                     }
 
@@ -74,10 +76,11 @@ public class MoodTracker {
                                         continue addMenuLoop;
                                     }
 
+
                                     switch (usrAction_addMenu) {
                                         case 1 -> {
                                             if (moods.contains(newMood)) {
-                                                System.out.println("You've already added an emotion at this time!\n");
+                                                System.out.println("You've already added such a mood at this time!");
                                                 continue addMenuLoop;
                                             }
                                             moods.add(newMood);
@@ -91,12 +94,24 @@ public class MoodTracker {
                                         case 3 -> {
                                             System.out.println("-Press Enter to keep the default (current) value-");
                                             System.out.print("Date (dd.MM.yyyy): ");
-                                            newMood.setDate(LocalDate.parse(sc.nextLine(), formatter));
+                                            try {
+                                                newMood.setDate(LocalDate.parse(sc.nextLine(), dateFormatter));
+                                            }
+                                            catch (DateTimeParseException e) {
+                                                newMood.setDate(LocalDate.parse(LocalDate.now().format(dateFormatter), dateFormatter));
+                                                System.out.println("-Default value set-");
+                                            }
                                         }
                                         case 4 -> {
                                             System.out.println("-Press Enter to keep the default (current) value-");
                                             System.out.print("Time (HH:mm): ");
-                                            newMood.setTime(LocalTime.parse(sc.nextLine()));
+                                            try {
+                                                newMood.setTime(LocalTime.parse(sc.nextLine(), timeFormatter));
+                                            }
+                                            catch (DateTimeParseException e) {
+                                                newMood.setTime(LocalTime.parse(LocalTime.now().format(timeFormatter), timeFormatter));
+                                                System.out.println("-Default value set-");
+                                            }
                                         }
                                         case 5 -> {
                                             System.out.print("Notes: ");
@@ -115,7 +130,52 @@ public class MoodTracker {
                             }
                         }
                         case 2 -> {
-                            //TODO
+                            if (moods.isEmpty()) {
+                                System.out.println("You haven't added a single mood yet!\n");
+                                continue mainLoop;
+                            }
+                            ArrayList<Integer> indexes = new ArrayList<>();
+                            System.out.print("Date (dd.MM.yyyy or Enter for back): ");
+                            try {
+                                LocalDate date = LocalDate.parse(sc.nextLine(), dateFormatter);
+                                for (int dateIdx = 0; dateIdx < moods.size(); dateIdx++) {
+                                    if (moods.get(dateIdx).equalsDate(date)) {
+                                        indexes.add(dateIdx);
+                                    }
+                                }
+                            }
+                            catch (DateTimeParseException e) {
+                                System.out.println();
+                                continue mainLoop;
+                            }
+
+                            if (indexes.isEmpty()) {
+                                System.out.println("No moods were found on this date!\n");
+                                continue mainLoop;
+                            }
+                            while(true) {
+                                System.out.println();
+                                for (int moodIdx = 0; moodIdx < indexes.size(); moodIdx++) {
+                                    System.out.println("[" + moodIdx + "] " + moods.get(indexes.get(moodIdx)));
+                                }
+                                System.out.print("Select the mood index to delete (Enter for back): ");
+                                try {
+                                    String moodIdx = sc.nextLine();
+                                    if (moodIdx.isBlank()) {
+                                        System.out.println();
+                                        continue mainLoop;
+                                    }
+                                    moods.remove(indexes.get(Integer.parseInt(moodIdx)).intValue());
+                                    break;
+                                }
+                                catch (NumberFormatException e) {
+                                    System.out.println("-You must enter a number-");
+                                }
+                                catch (IndexOutOfBoundsException e) {
+                                    System.out.println("-Specify an existing index-");
+                                }
+                            }
+                            System.out.println("The mood has been successfully deleted!\n");
                         }
                         case 3 -> {
                             //TODO
@@ -135,11 +195,11 @@ public class MoodTracker {
                             //TODO
                         }
                         case 0 -> {break mainLoop;}
-                        default -> System.out.println("Not a valid input!");
+                        /*default -> System.out.println("Not a valid input!");*/
                     }
                 }
                 catch (NumberFormatException e) {
-                    System.out.println("Enter a number!");
+                    System.out.println("Enter a number!\n");
                 }
             }
 

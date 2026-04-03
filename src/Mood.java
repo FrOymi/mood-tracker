@@ -57,12 +57,15 @@ public class Mood {
         return str;
     }
 
+    public boolean equalsDate(LocalDate date) {return this.date.isEqual(date);}
+    public boolean equalsTime(LocalTime time) {return this.time.equals(time);}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Mood secondMood = (Mood) o;
-        return this.date.isEqual(secondMood.getDate()) && this.time.equals(secondMood.getTime());
+        return getName().equalsIgnoreCase(secondMood.getName()) && getDate().isEqual(secondMood.getDate()) && getTime().equals(secondMood.getTime());
     }
 
     @Override
