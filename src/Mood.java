@@ -6,7 +6,7 @@ public class Mood {
     private LocalDate date = LocalDate.now();
     private LocalTime time = LocalTime.MIDNIGHT;
     private String name;
-    private String notes;
+    private String notes = "Empty";
 
     // Constructors
     public Mood(String name) {
@@ -24,17 +24,20 @@ public class Mood {
     public Mood(String name, String notes) {
         setName(name);
         setNotes(notes);
+        if (this.notes.isBlank()) {this.notes = "Empty";}
     }
     public Mood(String name, LocalDate date, String notes) {
         setName(name);
         setDate(date);
         setNotes(notes);
+        if (this.notes.isBlank()) {this.notes = "Empty";}
     }
     public Mood(String name, LocalDate date, LocalTime time, String notes) {
         setName(name);
         setDate(date);
         setTime(time);
         setNotes(notes);
+        if (this.notes.isBlank()) {this.notes = "Empty";}
     }
 
     // Getters
@@ -51,7 +54,7 @@ public class Mood {
 
     public String toString() {
         String str = "Name: " + name + " - Date: " + date +" - Time: " + time;
-        if (notes != null && !notes.isBlank()) {
+        if (!this.notes.equals("Empty")) {
             str += " - Notes: " + notes;
         }
         return str;

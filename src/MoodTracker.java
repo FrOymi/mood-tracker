@@ -1,9 +1,15 @@
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
+import java.util.List;
 
 public class MoodTracker {
     private static String setTimeOfDay(int hours) {
@@ -60,6 +66,23 @@ public class MoodTracker {
         Scanner sc = new Scanner(System.in);
         ArrayList<Mood> moods = new ArrayList<>();
 
+        Path path = Paths.get("moods.csv");
+        try {
+            if (Files.notExists(path)) {
+                Files.createFile(path);
+            }
+            else {
+                List<String> lines = Files.readAllLines(path);
+                for (String line: lines) {
+                    String[] columns = line.split(";");
+                    Mood loadedMood = new Mood(columns[0], LocalDate.parse(columns[1]), LocalTime.parse(columns[2]), columns[3]);
+                    moods.add(loadedMood);
+                }
+            }
+        }
+        catch (IOException e) {
+            System.err.println("-File handling error-");
+        }
 
         boolean appIsRunning = true;
         while(appIsRunning) {
@@ -73,7 +96,6 @@ public class MoodTracker {
                         "2. Delete mood\n" +
                         "3. Search for moods\n" +
                         "4. Get all moods\n" +
-                        "5. Write the moods to a file\n" +
                         "0. Exit\n" +
                         " >>> ");
                 try {
@@ -264,14 +286,23 @@ public class MoodTracker {
                             }
                             System.out.println();
                         }
-                        case 5 -> {
-                            //TODO
-                        }
                         case 0 -> {break mainLoop;}
                     }
                 }
                 catch (NumberFormatException e) {
                     System.out.println("Enter a number!\n");
+                }
+                finally {
+                    List<String> moodData = new ArrayList<>();
+                    for (Mood mood: moods) {
+                        moodData.add(mood.getName() + ";" + mood.getDate() + ";" + mood.getTime() + ";" + mood.getNotes());
+                    }
+                    try {
+                        Files.write(path, moodData, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+                    }
+                    catch (IOException e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
             }
 
