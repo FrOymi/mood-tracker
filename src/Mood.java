@@ -57,6 +57,7 @@ public class Mood {
         return str;
     }
 
+    public boolean equalsName(String name) {return this.name.equalsIgnoreCase(name);}
     public boolean equalsDate(LocalDate date) {return this.date.isEqual(date);}
     public boolean equalsTime(LocalTime time) {return this.time.equals(time);}
 

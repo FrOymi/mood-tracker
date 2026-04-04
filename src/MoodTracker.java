@@ -22,6 +22,37 @@ public class MoodTracker {
         return timeOfDay;
     }
 
+    private static ArrayList<Integer> searchMood(ArrayList<Mood> moods, DateTimeFormatter dateFormatter, DateTimeFormatter timeFormatter, Scanner sc) {
+        ArrayList<Integer> indexes = new ArrayList<>();
+        String usrInput = sc.nextLine();
+        if (usrInput.isBlank()) {
+            System.out.println();
+            return indexes;
+        }
+        String moodName = "";
+        try {
+            LocalDate date = LocalDate.parse(usrInput, dateFormatter);
+            for (int dateIdx = 0; dateIdx < moods.size(); dateIdx++) {
+                if (moods.get(dateIdx).equalsDate(date)) {
+                    indexes.add(dateIdx);
+                }
+            }
+        }
+        catch (DateTimeParseException e) {
+            moodName = usrInput;
+        }
+
+        if (!moodName.isEmpty()) {
+            for (int moodIdx = 0; moodIdx < moods.size(); moodIdx++) {
+                if (moods.get(moodIdx).equalsName(moodName)) {
+                    indexes.add(moodIdx);
+                }
+            }
+        }
+
+        return indexes;
+    }
+
     public static void main(String[] args) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -135,9 +166,16 @@ public class MoodTracker {
                                 continue mainLoop;
                             }
                             ArrayList<Integer> indexes = new ArrayList<>();
-                            System.out.print("Date (dd.MM.yyyy or Enter for back): ");
+                            System.out.println("-Enter for back-");
+                            System.out.print("Date (dd.MM.yyyy) or Mood name: ");
+                            String usrInput = sc.nextLine();
+                            if (usrInput.isBlank()) {
+                                System.out.println();
+                                continue mainLoop;
+                            }
+                            String moodName = "";
                             try {
-                                LocalDate date = LocalDate.parse(sc.nextLine(), dateFormatter);
+                                LocalDate date = LocalDate.parse(usrInput, dateFormatter);
                                 for (int dateIdx = 0; dateIdx < moods.size(); dateIdx++) {
                                     if (moods.get(dateIdx).equalsDate(date)) {
                                         indexes.add(dateIdx);
@@ -145,8 +183,31 @@ public class MoodTracker {
                                 }
                             }
                             catch (DateTimeParseException e) {
-                                System.out.println();
-                                continue mainLoop;
+                                moodName = usrInput;
+                            }
+
+                            if (!moodName.isEmpty()) {
+                                try {
+                                    System.out.print("Date (dd.MM.yyyy): ");
+                                    LocalDate date = LocalDate.parse(sc.nextLine(), dateFormatter);
+                                    System.out.print("Time (HH:mm): ");
+                                    LocalTime time = LocalTime.parse(sc.nextLine(), timeFormatter);
+                                    Mood testMood = new Mood(moodName, date, time);
+                                    if (moods.contains(testMood)) {
+                                        for (int moodIdx = 0; moodIdx < moods.size(); moodIdx++) {
+                                            if (moods.get(moodIdx).equalsName(moodName) && moods.get(moodIdx).equalsDate(date) && moods.get(moodIdx).equalsTime(time)) {
+                                                indexes.add(moodIdx);
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        System.out.println("-Mood not found-");
+                                    }
+                                }
+                                catch (DateTimeParseException e) {
+                                    System.out.println("-Incorrect input-");
+                                    continue mainLoop;
+                                }
                             }
 
                             if (indexes.isEmpty()) {
@@ -178,7 +239,19 @@ public class MoodTracker {
                             System.out.println("The mood has been successfully deleted!\n");
                         }
                         case 3 -> {
-                            //TODO
+                            if (moods.isEmpty()) {
+                                System.out.println("The list of moods is empty\n");
+                                continue mainLoop;
+                            }
+                            System.out.print("Mood name or date (dd.MM.yyyy): ");
+                            ArrayList<Integer> indexes = searchMood(moods, dateFormatter, timeFormatter, sc);
+                            if (indexes.isEmpty()) {
+                                System.out.println("-Mood not found-");
+                            }
+                            for (int moodIdx: indexes) {
+                                System.out.println(moods.get(moodIdx));
+                            }
+                            System.out.println();
                         }
                         case 4 -> {
                             if (moods.isEmpty()) {
@@ -195,7 +268,6 @@ public class MoodTracker {
                             //TODO
                         }
                         case 0 -> {break mainLoop;}
-                        /*default -> System.out.println("Not a valid input!");*/
                     }
                 }
                 catch (NumberFormatException e) {
