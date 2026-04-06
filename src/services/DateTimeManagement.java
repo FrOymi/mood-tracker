@@ -15,8 +15,8 @@ public class DateTimeManagement {
         dateTime.setTime(LocalTime.now());
         if (dateTime.getTime().getHour() >= 5 && dateTime.getTime().getHour() <= 11) dateTime.setTimeOfDay("Morning");
         if (dateTime.getTime().getHour() >= 12 && dateTime.getTime().getHour() <= 17) dateTime.setTimeOfDay("Afternoon");
-        if (dateTime.getTime().getHour() > 18 && dateTime.getTime().getHour() <= 21) dateTime.setTimeOfDay("Evening");
-        else dateTime.setTimeOfDay("Night");
+        if (dateTime.getTime().getHour() >= 18 && dateTime.getTime().getHour() <= 21) dateTime.setTimeOfDay("Evening");
+        if (dateTime.getTime().getHour() >= 22 || dateTime.getTime().getHour() <= 4) dateTime.setTimeOfDay("Night");
     }
 }
 
